@@ -21,12 +21,15 @@ public class client {
             adder ad = (adder) registry.lookup("Add service");
             System.out.println("Addition is: " +ad.add(87, 92));
 
-            time Time = (time) registry.lookup("Add service");
+            services Services = (services) registry.lookup("Add service");
             System.out.println("Local time: " + System.nanoTime());
-            System.out.println("Remote time: " + Time.getTime());
+            System.out.println("Remote time: " + Services.getTime());
 
-            service Massage = (message) registry.lookup("Add service");
-            Message.putString("hehe");
+            Services.putString("Local time: " + System.nanoTime());
+            Services.putString("Remote time: " + Services.getTime());
+
+            System.out.println("Current time of Asia/HoChiMinh: " + Services.getZonedDateTime("Asia/HoChiMinh"));
+            System.out.println("Current time of Europe/Munich: " + Services.getZonedDateTime("Europe/Munich"));
 
 
         } catch (NotBoundException | RemoteException e) {

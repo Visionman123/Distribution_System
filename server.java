@@ -2,12 +2,15 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.Time;
+import java.time.ZonedDateTime;
+import java.util.TimeZone;
 
 /**
  * 
  * @author HOME
  */
-public class server extends UnicastRemoteObject implements adder, time, message {
+public class server extends UnicastRemoteObject implements adder, services {
     public server() throws RemoteException {
         super();
     }
@@ -27,6 +30,13 @@ public class server extends UnicastRemoteObject implements adder, time, message 
         System.out.println(message);
     }
 
+    @Override
+    public ZonedDateTime getZonedDateTime(String zonedTime) throws RemoteException {
+        String[] id = TimeZone.getAvailableIDs(0);
+        ZonedDateTime zoneNow = ZonedDateTime.now(TimeZone.getTimeZone(zonedTime).toZoneId());
+        return zoneNow;
+    }
+    
     public static void main(String args[]) throws RemoteException {
         try {
             Registry reg = LocateRegistry.createRegistry(4444);
