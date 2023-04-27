@@ -32,7 +32,6 @@ public class server extends UnicastRemoteObject implements adder, services {
 
     @Override
     public ZonedDateTime getZonedDateTime(String zonedTime) throws RemoteException {
-        String[] id = TimeZone.getAvailableIDs(0);
         ZonedDateTime zoneNow = ZonedDateTime.now(TimeZone.getTimeZone(zonedTime).toZoneId());
         return zoneNow;
     }
