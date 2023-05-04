@@ -1,3 +1,4 @@
+package Hands_on_lab_1;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
