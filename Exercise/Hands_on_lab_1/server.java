@@ -17,7 +17,7 @@ import java.util.TimeZone;
  * 
  * @author HOME
  */
-public class server extends UnicastRemoteObject implements adder, services {
+public class server extends UnicastRemoteObject implements adder, services, ServerInterface {
     public server() throws RemoteException {
         super();
     }
@@ -46,7 +46,8 @@ public class server extends UnicastRemoteObject implements adder, services {
     // Set up database
     private final String url = "jdbc:postgresql://localhost:5432/postgres";
     private final String user = "postgres";
-    private final String password = "abc";
+    private final String password = "Nhn@300102";
+    private final String database = "Distributed_system";
 
     public Connection connect() throws SQLException {
         Connection conn = null;
@@ -60,31 +61,35 @@ public class server extends UnicastRemoteObject implements adder, services {
     }
 
     // Database query
-    // String SQL = "SELECT * FROM "Retail Sales\"";
-    ResultSet rs = null;try(
-    Connection conn = connect();
-    PreparedStatement pstmt = conn.prepareStatement(SQL))
-    {
-        rs = pstmt.executeQuery();
-    }
+    public ResultSetMetaData printItembyProvider(String providerName) throws RemoteException, SQLException{
+        String SQL = "SELECT * FROM \"Retail Sales\" where supplier=?";
+        ResultSet rs = null;
+        try (
+                Connection conn = connect();
+                PreparedStatement pstmt = conn.prepareStatement(SQL)) {
+            rs = pstmt.executeQuery();
+        }
 
-    // result set display
-    ResultSetMetaData rsmd = rs.getMetaData();
-    int columnsNumber = rsmd.getColumnCount();for(
-    int i = 1;i<=columnsNumber;i++)
-    {
-        System.out.print(rsmd.getColumnName(i) + "\t");
-    }
-    while(rs.next()) {
-        System.out.println(rs.getString("year")+"It"
-        + rs.getString("month") + "It" 
-        + rs.getString("supplier") + "It" 
-        + rs.getString("item_code") + "It" 
-        + rs.getString("item description") + "It" 
-        + rs.getString("item type") + "It" 
-        + rs.getString("retail sales") + "It" 
-        + rs.getString("retail transfer") + "It"
-        + rs.getString("warehouse sales")); 
+        // result set display
+        ResultSetMetaData rsmd = rs.getMetaData();
+        int columnsNumber = rsmd.getColumnCount();
+        for (int i = 1; i <= columnsNumber; i++) {
+            System.out.print(rsmd.getColumnName(i) + "\t");
+        }
+        
+
+        while (rs.next()) {
+            System.out.println(rs.getString("year") + "It"
+                    + rs.getString("month") + "It"
+                    + rs.getString("supplier") + "It"
+                    + rs.getString("item_code") + "It"
+                    + rs.getString("item description") + "It"
+                    + rs.getString("item type") + "It"
+                    + rs.getString("retail sales") + "It"
+                    + rs.getString("retail transfer") + "It"
+                    + rs.getString("warehouse sales"));
+        }
+        return rsmd;
     }
 
     public static void main(String args[]) throws RemoteException {
