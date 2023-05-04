@@ -17,8 +17,8 @@ import java.util.TimeZone;
  * 
  * @author HOME
  */
-public class Server extends UnicastRemoteObject implements adder, services, ServerInterface {
-    public Server() throws RemoteException {
+public class server extends UnicastRemoteObject implements adder, services, ServerInterface {
+    public server() throws RemoteException {
         super();
     }
 

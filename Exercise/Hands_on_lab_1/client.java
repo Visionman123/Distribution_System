@@ -36,7 +36,7 @@ public class client {
             // print the ResultSetMetaData
             // Call the remote method
             server Server = (server) registry.lookup("Server");
-            ResultSetMetaData rsmd = Server.printItembyProvider("DOPS INC");
+            ResultSetMetaData rsmd = server.printItembyProvider("DOPS INC");
 
             // Process the result set metadata received from the server
             int columnsNumber = rsmd.getColumnCount();
