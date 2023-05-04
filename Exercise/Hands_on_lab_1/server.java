@@ -4,22 +4,41 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.ZonedDateTime;
+import java.util.TimeZone;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.time.ZonedDateTime;
-import java.util.TimeZone;
+import java.sql.Statement;
 
 /**
  * 
  * @author HOME
  */
-public class server extends UnicastRemoteObject implements adder, services, ServerInterface {
+
+public class server extends UnicastRemoteObject implements services {
+
+    private final String url = "jdbc:postgresql://localhost:5432/postgres";
+    private final String user = "postgres";
+    private final String password = "Nhn@300102";
+
     public server() throws RemoteException {
         super();
+    }
+
+    public Connection connect() throws SQLException {
+        Connection conn = null;
+        try {
+            conn = DriverManager.getConnection(url, user, password);
+            System.out.println("Connected to the PostgreSQL server successfully.");
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return conn;
     }
 
     @Override
@@ -39,57 +58,41 @@ public class server extends UnicastRemoteObject implements adder, services, Serv
 
     @Override
     public ZonedDateTime getZonedDateTime(String zonedTime) throws RemoteException {
+        String[] id = TimeZone.getAvailableIDs();
         ZonedDateTime zoneNow = ZonedDateTime.now(TimeZone.getTimeZone(zonedTime).toZoneId());
         return zoneNow;
     }
 
-    // Set up database
-    private final String url = "jdbc:postgresql://localhost:5432/postgres";
-    private final String user = "postgres";
-    private final String password = "Nhn@300102";
-    private final String database = "Distributed_system";
-
-    public Connection connect() throws SQLException {
-        Connection conn = null;
+    @Override
+    public String printItembyProvider(String providerName) throws RemoteException {
+        String query = "SELECT * FROM \"Retail Sales\" WHERE supplier = \'" + providerName + "\'";
+        String ans = "";
         try {
-            conn = DriverManager.getConnection(url, user, password);
-            System.out.println("Connected to the PostgreSQL server successfully.");
+            Connection conn = connect();
+            // System.out.println(conn);
+            Statement pstmt = conn.createStatement();
+            ResultSet rs = pstmt.executeQuery(query);
+            ResultSetMetaData rsmd = rs.getMetaData();
+            int columnsNumber = rsmd.getColumnCount();
+            for (int i = 1; i <= columnsNumber; i++) {
+                ans = ans + (rsmd.getColumnName(i) + "\t");
+            }
+
+            while (rs.next()) {
+                ans = ans + (rs.getString("year") + "\t"
+                        + rs.getString("month") + "\t"
+                        + rs.getString("supplier") + "\t"
+                        + rs.getString("item_code") + "\t"
+                        + rs.getString("item_description") + "\t"
+                        + rs.getString("item_type") + "\t"
+                        + rs.getString("retail_sales") + "\t"
+                        + rs.getString("retail_transfer") + "\t"
+                        + rs.getString("warehouse_sales") + "\n");
+            }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
-        return conn;
-    }
-
-    // Database query
-    public ResultSetMetaData printItembyProvider(String providerName) throws RemoteException, SQLException{
-        String SQL = "SELECT * FROM \"Retail Sales\" where supplier=?";
-        ResultSet rs = null;
-        try (
-                Connection conn = connect();
-                PreparedStatement pstmt = conn.prepareStatement(SQL)) {
-            rs = pstmt.executeQuery();
-        }
-
-        // result set display
-        ResultSetMetaData rsmd = rs.getMetaData();
-        int columnsNumber = rsmd.getColumnCount();
-        for (int i = 1; i <= columnsNumber; i++) {
-            System.out.print(rsmd.getColumnName(i) + "\t");
-        }
-        
-
-        while (rs.next()) {
-            System.out.println(rs.getString("year") + "It"
-                    + rs.getString("month") + "It"
-                    + rs.getString("supplier") + "It"
-                    + rs.getString("item_code") + "It"
-                    + rs.getString("item description") + "It"
-                    + rs.getString("item type") + "It"
-                    + rs.getString("retail sales") + "It"
-                    + rs.getString("retail transfer") + "It"
-                    + rs.getString("warehouse sales"));
-        }
-        return rsmd;
+        return ans;
     }
 
     public static void main(String args[]) throws RemoteException {

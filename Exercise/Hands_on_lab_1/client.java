@@ -4,12 +4,14 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.*;
 
 /**
  * 
  * @author HOME
  */
+
 public class client {
     public static void main(String args[]) {
         client c = new client();
@@ -18,34 +20,32 @@ public class client {
 
     private void connectRemote() {
         try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 4444);
+            Scanner sc = new Scanner(System.in);
 
-            adder ad = (adder) registry.lookup("Add service");
-            System.out.println("Addition is: " + ad.add(87, 92));
+            Registry reg = LocateRegistry.getRegistry("localhost", 4444);
+            services service = (services) reg.lookup("Add service");
+            System.out.println("Addition is: " + service.add(87, 92));
 
-            services Services = (services) registry.lookup("Add service");
-            System.out.println("Local time: " + System.nanoTime());
-            System.out.println("Remote time: " + Services.getTime());
+            long local = System.nanoTime();
+            long host = service.getTime();
+            System.out.println("Local time: " + local);
+            System.out.println("Host time: " + host);
 
-            Services.putString("Local time: " + System.nanoTime());
-            Services.putString("Remote time: " + Services.getTime());
+            service.putString("Local time: " + local);
+            service.putString("Host time: " + host);
 
-            System.out.println("Current time of Asia/HoChiMinh: " + Services.getZonedDateTime("Asia/HoChiMinh"));
-            System.out.println("Current time of Europe/Munich: " + Services.getZonedDateTime("Europe/Munich"));
+            System.out.println("Current time of Asia/Ho_Chi_minh: " + service.getZonedDateTime("Asia/Ho_Chi_minh"));
+            System.out.println("Current time of Europe/Munich: " + service.getZonedDateTime("Europe/Munich"));
 
-            // print the ResultSetMetaData
-            // Call the remote method
-            server Server = (server) registry.lookup("Server");
-            ResultSetMetaData rsmd = server.printItembyProvider("DOPS INC");
+            //service.resultSetDisplay();
 
-            // Process the result set metadata received from the server
-            int columnsNumber = rsmd.getColumnCount();
-            for (int i = 1; i <= columnsNumber; i++) {
-                System.out.print(rsmd.getColumnName(i) + "\t");
-            }
+            System.out.print("Enter a provider name: ");
+            String providerName = sc.nextLine();
+            System.out.println(service.printItembyProvider(providerName));
 
         } catch (NotBoundException | RemoteException e) {
-            System.out.println("Exception: " + e.getMessage());
+            System.out.println("Exception: " + e);
         }
+
     }
 }
