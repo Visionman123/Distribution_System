@@ -1,9 +1,27 @@
-package Exercise.Hands_on_lab_3.project;
+import java.io.*;
 
 public class MainApplication {
     public static void main(String[] args) {
+
         SensorDataRecorder sensorDataRecorder = new SensorDataRecorder();
-        ThresholdChecker thresholdChecker = new ThresholdChecker();
+        // Get random sensor data values
+        double temperature = sensorDataRecorder.getTemperature();
+        double soilHumidity = sensorDataRecorder.getSoilHumidity();
+        double airHumidity = sensorDataRecorder.getAirHumidity();
+        double pH = sensorDataRecorder.getpH();
+        double luminosity = sensorDataRecorder.getLuminosity();
+
+        ThresholdChecker thresholdChecker = new ThresholdChecker(30, 70, 50, 7, 800);
+        // Get random sensor data values
+        double temperature = sensorDataRecorder.getTemperature();
+        double soilHumidity = sensorDataRecorder.getSoilHumidity();
+        double airHumidity = sensorDataRecorder.getAirHumidity();
+        double pH = sensorDataRecorder.getpH();
+        double luminosity = sensorDataRecorder.getLuminosity();
+        // Check thresholds and take actions if necessary
+        thresholdChecker.checkThresholds(temperature, soilHumidity, airHumidity, pH, luminosity);
+
+        
         ActuatorController actuatorController = new ActuatorController();
         Dashboard dashboard = new Dashboard();
 
